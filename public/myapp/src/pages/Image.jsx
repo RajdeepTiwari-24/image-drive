@@ -6,75 +6,103 @@ import axios from "axios";
 export default function Image() {
   const navigate = useNavigate();
   const [file, setFile] = useState();
-  const [image,setImage]=useState();
+  const [images,setImages]=useState([]);
+  const [reload,setreload]= useState(false);
   useEffect(() => {
     if (!localStorage.getItem("USER")) {
       navigate("/login");
     }
   }, []);
+  useEffect(()=>{
+    axios.get("http://localhost:5000/getImage")
+    .then((res)=> {
+      setImages(res.data)
+    })
+    .catch((e) => console.log(e));
+    console.log(reload);
+  },[reload]);
+
   const handleUpload = (e) => {
     const formdata=new FormData();
     formdata.append('file',file);
     axios.post("http://localhost:5000/upload",formdata)
-    .then((res)=> console.log(res))
+    .then((res)=> setreload(prevReload => !prevReload))
     .catch((e) => console.log(e));
-    // console.log(file);
+    
+    console.log(reload);
   };
   const handleClick = () => {
     localStorage.clear();
     navigate("/login");
   };
-  useEffect(()=>{
-    axios.get("http://localhost:5000/getImage")
-    .then((res)=> {
-      setImage(res.data[0].image)
-      console.log(res.data[0].image);
-    })
-    .catch((e) => console.log(e));
-    // console.log(image);
-  },[]);
-
+ 
   return (
     <Container>
-      {/* <div className="container"> */}
-      {/* <div>Image</div> */}
-      <div>
+      <div className="top-section">
         <input type="file" onChange={(e) => setFile(e.target.files[0])} />
         <button onClick={handleUpload}>Upload</button>
-        {/* </div> */}
-        <br />
-        {/* <h1>{`image`}</h1> */}
-        <img src={`http://localhost:5000/images/${image}`} alt=""/>
-        <button onClick={handleClick}>Logout</button>
       </div>
+      <div className="image-section">
+        {images.map((image) => (
+          <img key={image.id} src={`http://localhost:5000/images/${image.image}`} alt=""/>
+        ))}
+      </div>
+      <button className="logout-btn" onClick={handleClick}>Logout</button>
     </Container>
   );
 }
 
-const Container = styled.div`
-  height: 100vh;
-  width: 100vw;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  gap: 1rem;
-  align-items: center;
-  .container {
-    height: 85vh;
-    width: 85vw;
-    // background-color: #00000076;
-    backdrop-filter: blur(5px);
-    border: 10px solid black;
-    // border-radius: 2rem;
-    display: grid;
-    grid-template-columns: 25% 75%;
-    @media screen and (min-width: 720px) and (max-width: 1080px) {
-      grid-template-columns: 35% 65%;
+  const Container = styled.div`
+    height: 100vh;
+    width: 100vw;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    position: relative;
+  
+    .top-section {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      margin-top: 20px;
     }
-  }
-  button {
-    color: red;
-    font-size: 2rem;
-    height: 50px;
-  }
-`;
+  
+    button {
+      color: white;
+      background-color: #f44336;
+      border: none;
+      border-radius: 5px;
+      font-size: 1.5rem;
+      padding: 10px 20px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+  
+      &:hover {
+        background-color: #d32f2f;
+      }
+    }
+  
+    .image-section {
+      width: 80%;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 1rem;
+      border: 10px solid black;
+      padding: 10px;
+      margin: auto;
+    }
+  
+    .logout-btn {
+      align-self: flex-end;
+      margin-top: auto;
+      margin-bottom: 20px;
+    }
+  
+    img {
+      height: 120px;
+      width: auto;
+      border-radius: 5px;
+    }
+  `;
+  
