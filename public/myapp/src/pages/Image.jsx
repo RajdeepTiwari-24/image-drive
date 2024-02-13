@@ -5,6 +5,7 @@ import axios from "axios";
 
 export default function Image() {
   const navigate = useNavigate();
+  const getuser = JSON.parse(localStorage.getItem("USER"))._id;
   const [file, setFile] = useState();
   const [images, setImages] = useState([]);
   const [reload, setreload] = useState(false);
@@ -15,23 +16,29 @@ export default function Image() {
   }, []);
   useEffect(() => {
     axios
-      .get("http://localhost:5000/getImage")
+      .get(`http://localhost:5000/getImage?userid=${getuser}`)
       .then((res) => {
-        setImages(res.data);
+        const imageData = Array.isArray(res.data) ? res.data : [];
+        setImages(imageData);
       })
       .catch((e) => console.log(e));
-    console.log(reload);
+    // console.log(reload);
   }, [reload]);
 
   const handleUpload = (e) => {
     const formdata = new FormData();
+    // const getuser = JSON.parse(localStorage.getItem("USER"))._id;
+    // console.log(getCurrentChat);
+    // console.log(file);
     formdata.append("file", file);
+    formdata.append("userid", getuser);
     axios
       .post("http://localhost:5000/upload", formdata)
       .then((res) => setreload((prevReload) => !prevReload))
       .catch((e) => console.log(e));
 
-    console.log(reload);
+    // console.log(reload);
+    console.log(localStorage.getItem("USER"));
   };
   const handleClick = () => {
     localStorage.clear();
@@ -47,6 +54,7 @@ export default function Image() {
         <button onClick={handleUpload}>Upload</button>
       </div>
       <div className="image-section">
+        <h3>The following are the images in your drive:</h3>
         <ul>
           {images.map((image) => (
             <li>
@@ -86,6 +94,7 @@ const Container = styled.div`
     align-items: center;
     gap: 1rem;
     margin-top: 20px;
+    backdrop-filter: blur(10px);
   }
 
   button {
@@ -109,21 +118,28 @@ const Container = styled.div`
     flex-direction: column;
     flex-wrap: wrap;
     align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(10px);
+
     ul {
       /* margin: 0px; */
       overflow: auto;
+      max-width: 100%;
+      list-style: none;
       li {
-        background-color: white;
-        border: 2px solid black;
-        margin: 10px auto;
         img {
-          max-width: 100%;
-          height: auto;
+          width: auto;
+          height: 100px;
+          background-color: white;
+          border: 2px solid black;
+          margin: 10px auto;
+          box-shadow: 4px 4px 5px gray;
         }
       }
     }
     gap: 1rem;
-    border: 10px solid black;
+    border: 5px solid black;
+    border-radius: 20px;
     padding: 10px;
     margin: auto;
   }
