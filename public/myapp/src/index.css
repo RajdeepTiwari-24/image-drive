@@ -1,3 +1,7 @@
+* {
+  margin: 0px;
+  padding: 0px;
+}
 button,
 input {
   font-family: "Josefin Sans", sans-serif;
