@@ -1,31 +1,46 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
-
+import axios from "axios";
 export default function Image() {
   const navigate = useNavigate();
   const [file, setFile] = useState();
+  const [image,setImage]=useState();
   useEffect(() => {
     if (!localStorage.getItem("USER")) {
       navigate("/login");
     }
   }, []);
   const handleUpload = (e) => {
+    const formdata=new FormData();
+    formdata.append('file',file);
+    axios.post("http://localhost:5000/upload",formdata)
+    .then((res)=> console.log(res))
+    .catch((e) => console.log(e));
     console.log(file);
   };
   const handleClick = () => {
     localStorage.clear();
     navigate("/login");
   };
-
+  useEffect(()=>{
+    axios.get("http://localhost:5000/getImage")
+    .then((res)=> setImage(res.data[0].image))
+    .catch((e) => console.log(e));
+  },[]);
   return (
     <Container>
       {/* <div className="container"> */}
-      <div>Image</div>
-      <input type="file" onChange={(e) => setFile(e.target.files[0])} />
-      <button onClick={handleUpload}>Upload</button>
-      {/* </div> */}
-      <button onClick={handleClick}>Logout</button>
+      {/* <div>Image</div> */}
+      <div>
+        <input type="file" onChange={(e) => setFile(e.target.files[0])} />
+        <button onClick={handleUpload}>Upload</button>
+        {/* </div> */}
+        <br />
+        {/* <h1>{`image`}</h1> */}
+        <img src={`http://localhost:5000/images/`+image} alt=""/>
+        <button onClick={handleClick}>Logout</button>
+      </div>
     </Container>
   );
 }
