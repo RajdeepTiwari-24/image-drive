@@ -44,7 +44,7 @@ export default function Image() {
         {/* </div> */}
         <br />
         {/* <h1>{`image`}</h1> */}
-        <img src={`http://localhost:5000/images`+image} alt=""/>
+        <img src={`http://localhost:5000/images/${image}`} alt=""/>
         <button onClick={handleClick}>Logout</button>
       </div>
     </Container>
