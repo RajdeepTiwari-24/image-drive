@@ -1,31 +1,33 @@
-import React,{useEffect} from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 
 export default function Image() {
-    const navigate = useNavigate();
-    useEffect(() => {
-        if (!localStorage.getItem("USER")) {
-          navigate("/login");
-        }
-      }, []);
-    const handleClick =() => {
-        localStorage.clear();
-        navigate("/login");
-    };
+  const navigate = useNavigate();
+  const [file, setFile] = useState();
+  useEffect(() => {
+    if (!localStorage.getItem("USER")) {
+      navigate("/login");
+    }
+  }, []);
+  const handleUpload = (e) => {
+    console.log(file);
+  };
+  const handleClick = () => {
+    localStorage.clear();
+    navigate("/login");
+  };
 
   return (
     <Container>
-         <div className="container">
-            <div>Image</div>
-        </div>
-        <button onClick={handleClick}>
-            Logout
-        </button>
+      {/* <div className="container"> */}
+      <div>Image</div>
+      <input type="file" onChange={(e) => setFile(e.target.files[0])} />
+      <button onClick={handleUpload}>Upload</button>
+      {/* </div> */}
+      <button onClick={handleClick}>Logout</button>
     </Container>
-       
-    
-  )
+  );
 }
 
 const Container = styled.div`
@@ -49,8 +51,9 @@ const Container = styled.div`
       grid-template-columns: 35% 65%;
     }
   }
-  button{
+  button {
     color: red;
-    font-size: 5rem;
+    font-size: 2rem;
+    height: 50px;
   }
 `;
