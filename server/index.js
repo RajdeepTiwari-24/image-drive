@@ -10,6 +10,7 @@ const images=require('./models/image')
 app.use(cors());
 app.use(express.json());
 app.use(express.static('public'));
+
 mongoose
   .connect(process.env.MONGO_URL, {
     useNewUrlParser: true,
@@ -37,16 +38,20 @@ const upload=multer({
   storage:storage
 })
 
-app.post('/upload',upload.single('file'), async(req,res)=>{
-  await images.create({image:req.file.filename});
-  console.log('ok');
+app.post('/upload',upload.single('file'), (req,res)=>{
+  images.create({image:req.file.filename})  
+  .then(result=> res.json(result))
+  .catch(err=> console.log(err));;
+  // console.log('ok');
 })
 
-app.get('/getImage',async(req,res)=>{
-  console.log('aa gye');
-  const img=await images.find();
-  console.log(img);
-})
+app.get('/getImage',(req,res)=>{
+  // console.log('aa gye');
+  images.find()
+  .then(img=> res.json(img))
+  .catch(err=> res.json(err));
+  // return image;
+});
 
 const server = app.listen(process.env.PORT, () =>
   console.log(`Server started on ${process.env.PORT}`)
