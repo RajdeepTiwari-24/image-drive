@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import axios from "axios";
-import { uploadimagesRoute, getimagesRoute } from "../utils/APIRoutes";
+import { uploadimagesRoute, getimagesRoute, deleteRoute } from "../utils/APIRoutes";
 
 export default function Image() {
   const navigate = useNavigate();
@@ -43,6 +43,17 @@ export default function Image() {
     navigate("/login");
   };
 
+  const deleteClick=(imagename)=>{
+    console.log("Delete Clicked");
+    axios
+    .post(deleteRoute, { userid: getuser, imagename: imagename })
+    .then((res) => {
+      setreload((prevReload) => !prevReload);
+      alert(res.data.message);
+    })
+    .catch((e) => console.log(e));
+  }
+
   return (
     <Container>
       <div className="top-section">
@@ -50,9 +61,9 @@ export default function Image() {
         <h2>Please Select your file and click Upload.</h2>
         <input type="file" onChange={(e) => setFile(e.target.files[0])} />
         <button onClick={handleUpload}>Upload</button>
-      </div>
+      </div> 
+      <h3>The following are the images in your drive:</h3>
       <div className="image-section">
-        <h3>The following are the images in your drive:</h3>
         <ul>
           {images.map((image) => (
             <li>
@@ -61,6 +72,9 @@ export default function Image() {
                 src={`http://localhost:5000/images/${image.image}`}
                 alt=""
               />
+              <button onClick={() => deleteClick(image.image)}>
+                Delete
+              </button>
             </li>
           ))}
         </ul>
@@ -81,7 +95,7 @@ const Container = styled.div`
   gap: 1rem;
   position: relative;
   background-image: url("https://img.freepik.com/free-vector/neumorphic-round-shape-design-empty-white-banner_1017-43171.jpg?w=1380&t=st=1707828356~exp=1707828956~hmac=463bffd3b2c0102d76ec1f6a0892cd0eaec094e886360509f679bb5b51fd2892");
-  background-repeat: no-repeat;
+  background-repeat: repeat-y;
   background-size: cover;
   .top-section {
     width: 700px;
@@ -110,36 +124,27 @@ const Container = styled.div`
     }
   }
   .image-section {
-    width: 80%;
-    overflow-y: auto;
-    display: flex;
-    flex-direction: column;
-    flex-wrap: wrap;
-    align-items: center;
-    justify-content: center;
-    backdrop-filter: blur(10px);
-
-    ul {
-      /* margin: 0px; */
-      overflow: auto;
-      max-width: 100%;
-      list-style: none;
-      li {
-        img {
-          width: auto;
-          height: 100px;
-          background-color: white;
-          border: 2px solid black;
-          margin: 10px auto;
-          box-shadow: 4px 4px 5px gray;
-        }
+    width: 90%;
+    height: auto;
+    border: 10px solid black;
+    min-height: 50%;
+    ul{
+      list-style:none;
+      display: flex;
+      flex-direction: row;
+      justify-content: center;
+      gap: 1rem;
+      width: 80%;
+      margin: auto;
+      padding: 1.5rem;
+      flex-wrap: wrap;
+      li{
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.25rem;
       }
     }
-    gap: 1rem;
-    border: 5px solid black;
-    border-radius: 20px;
-    padding: 10px;
-    margin: auto;
   }
 
   .logout-btn {
@@ -151,7 +156,7 @@ const Container = styled.div`
   }
 
   img {
-    height: 120px;
+    height: 10rem;
     width: auto;
     border-radius: 5px;
   }

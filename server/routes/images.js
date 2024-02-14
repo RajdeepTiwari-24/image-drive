@@ -1,7 +1,6 @@
 const express = require("express");
 const multer = require("multer");
 const path = require("path");
-
 const users = require("../models/userModel");
 const router = require("express").Router();
 
@@ -23,14 +22,12 @@ const upload = multer({
 });
 
 router.post("/upload", upload.single("file"), (req, res) => {
-    // console.log(req.body);
-    // console.log(req.file);
     const userId = req.body.userid;
     const { filename } = req.file;
     users
       .findOneAndUpdate(
-        { _id: userId }, // Assuming userId is the ID of the user
-        { $push: { images: filename } }, // Append filename to the images array
+        { _id: userId }, 
+        { $push: { images: filename } }, 
         { new: true }
       )
       .then((user) => {
@@ -41,16 +38,12 @@ router.post("/upload", upload.single("file"), (req, res) => {
         res.json({ image: filename, userId: userId });
       })
       .catch((err) => res.status(500).json({ error: "Internal server error" }));
-    // .create({ image: filename, userId: userId })
-    // .then((result) => res.json(result))
-    // .catch((err) => console.log(err));
-    // console.log('ok');
   });
   
  router.get("/getImage", (req, res) => {
     const userId = req.query.userid;
     users
-      .findOne({ _id: userId }) // Assuming _id is the unique identifier for users
+      .findOne({ _id: userId }) 
       .then((user) => {
         if (!user) {
           return res.status(404).json({ error: "User not found" });
@@ -67,6 +60,25 @@ router.post("/upload", upload.single("file"), (req, res) => {
         console.error(err);
         res.status(500).json({ error: "Internal server error" });
       });
+  });
+  
+  router.post("/deleteImage", async (req, res) => {
+    console.log("Delete Route");
+    try {
+      const userId = req.body.userid;
+      const imageName = req.body.imagename;
+      const user = await users.findById(userId);
+  
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      user.images = user.images.filter(image => image !== imageName);
+      await user.save();
+      res.status(200).json({ message: "Image deleted successfully" });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: "Internal server error" });
+    }
   });
   
 
