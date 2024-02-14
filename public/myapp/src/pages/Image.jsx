@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import axios from "axios";
+import { uploadimagesRoute, getimagesRoute } from "../utils/APIRoutes";
 
 export default function Image() {
   const navigate = useNavigate();
@@ -16,7 +17,7 @@ export default function Image() {
   }, []);
   useEffect(() => {
     axios
-      .get(`http://localhost:5000/getImage?userid=${getuser}`)
+      .get(`${getimagesRoute}?userid=${getuser}`)
       .then((res) => {
         const imageData = Array.isArray(res.data) ? res.data : [];
         setImages(imageData);
@@ -27,13 +28,10 @@ export default function Image() {
 
   const handleUpload = (e) => {
     const formdata = new FormData();
-    // const getuser = JSON.parse(localStorage.getItem("USER"))._id;
-    // console.log(getCurrentChat);
-    // console.log(file);
     formdata.append("file", file);
     formdata.append("userid", getuser);
     axios
-      .post("http://localhost:5000/upload", formdata)
+      .post(uploadimagesRoute, formdata)
       .then((res) => setreload((prevReload) => !prevReload))
       .catch((e) => console.log(e));
 
